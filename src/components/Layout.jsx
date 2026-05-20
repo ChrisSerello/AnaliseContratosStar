@@ -36,7 +36,7 @@ export function Sidebar({ page, setPage, hasData }) {
         </div>
         <div>
           <div style={{ fontSize:13, fontWeight:700, color:C.txt, letterSpacing:"-0.02em" }}>
-            ContractIQ
+            STARCARD
           </div>
           <div style={{ fontSize:9, color:C.txm, letterSpacing:"0.05em", textTransform:"uppercase", marginTop:1 }}>
             Análise de Contratos

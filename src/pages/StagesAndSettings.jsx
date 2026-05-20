@@ -131,7 +131,7 @@ export function SettingsPage() {
 
       <Card title="Sobre o Sistema" style={{ marginTop:10 }}>
         <div style={{ fontSize:11, color:C.txs, lineHeight:1.7 }}>
-          <b style={{ color:C.txt }}>ContractIQ</b> — Análise de contratos e propostas via importação de planilha.<br/>
+          <b style={{ color:C.txt }}>STARCARD</b> — Análise de contratos e propostas via importação de planilha.<br/>
           Versão 1.0 · Desenvolvido com React + Recharts + SheetJS + PapaParse.<br/><br/>
           <b style={{ color:C.txt }}>Campos obrigatórios:</b>{" "}
           Nome Matriz, Nome Promotora, Ponto de Venda, Situação, Atividade, Motivo da Recusa,
