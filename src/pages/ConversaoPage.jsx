@@ -252,19 +252,24 @@ export function ConversaoPage({ data }) {
   const [detalhe,    setDetalhe]    = useState(null); // { record, scoreData, colId }
   const [filtroCat,  setFiltroCat]  = useState("");
   const [filtroNivel,setFiltroNivel]= useState("");
+  const [filtroPromo, setFiltroPromo] = useState("");
   const [abaVis,     setAbaVis]     = useState("kanban"); // kanban | fila | painel
 
   useEffect(() => { saveConv(conv); }, [conv]);
 
   const moveCard = (id, novaCol) => setConv(c => ({ ...c, [id]: novaCol }));
 
-  // Scored records
+  // Scored records — filtro de promotora aplicado globalmente
   const scored = useMemo(() => {
-    return recusados.map(r => ({ r, s: calcScore(r) }));
-  }, [recusados]);
+    return recusados
+      .filter(r => !filtroPromo || r.nome_promotora === filtroPromo)
+      .map(r => ({ r, s: calcScore(r) }));
+  }, [recusados, filtroPromo]);
 
-  // Batch stats
-  const batch = useMemo(() => calcBatchStats(recusados), [recusados]);
+  // Batch stats (respeita filtro de promotora)
+  const batch = useMemo(() => calcBatchStats(
+    filtroPromo ? recusados.filter(r => r.nome_promotora === filtroPromo) : recusados
+  ), [recusados, filtroPromo]);
 
   // Agrupar por coluna kanban
   const byCol = useMemo(() => {
@@ -290,6 +295,7 @@ export function ConversaoPage({ data }) {
 
   const cats   = useMemo(() => [...new Set(scored.map(x=>x.s.categoria))].sort(), [scored]);
   const niveis = ["Alta","Média","Baixa"];
+  const promos = useMemo(() => [...new Set(recusados.map(r=>r.nome_promotora).filter(Boolean))].sort(), [recusados]);
 
   // Dados overview
   const catStats = useMemo(() => {
@@ -344,9 +350,11 @@ export function ConversaoPage({ data }) {
         ))}
       </div>
 
-      {/* ── Tabs ───────────────────────────────────────── */}
+      {/* ── Tabs + Filtros ─────────────────────────────── */}
       <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 14px",
-        borderBottom:`1px solid ${C.bdr}`, flexShrink:0, background:C.surf }}>
+        borderBottom:`1px solid ${C.bdr}`, flexShrink:0, background:C.surf, flexWrap:"wrap" }}>
+
+        {/* Tabs */}
         <div style={{ display:"flex", gap:2, background:C.bg, borderRadius:8, padding:3 }}>
           {[
             ["kanban", "🎯 Kanban de Conversão"],
@@ -365,8 +373,34 @@ export function ConversaoPage({ data }) {
           ))}
         </div>
 
+        {/* Divisor */}
+        <div style={{ width:1, height:20, background:C.bdr, flexShrink:0 }}/>
+
+        {/* Filtro de Promotora — sempre visível em todas as abas */}
+        <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+          <span style={{ fontSize:10, color:C.txm, fontWeight:500, flexShrink:0 }}>Promotora:</span>
+          <select value={filtroPromo} onChange={e=>setFiltroPromo(e.target.value)}
+            style={{ padding:"5px 9px", borderRadius:7, border:`1px solid ${filtroPromo ? C.pri : C.bdr}`,
+              background: filtroPromo ? C.prl : C.bg, fontSize:11,
+              color: filtroPromo ? C.pri : C.txm, outline:"none",
+              fontWeight: filtroPromo ? 600 : 400, minWidth:140,
+              boxShadow: filtroPromo ? `0 0 0 2px ${C.prl}` : "none",
+              transition:"all .15s" }}>
+            <option value="">Todas as promotoras</option>
+            {promos.map(p => <option key={p} value={p}>{p}</option>)}
+          </select>
+          {filtroPromo && (
+            <button onClick={()=>setFiltroPromo("")}
+              style={{ width:22, height:22, borderRadius:"50%", border:`1px solid ${C.bdr}`,
+                background:C.surf, fontSize:12, cursor:"pointer", color:C.txs,
+                display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>×</button>
+          )}
+        </div>
+
+        {/* Filtros extras — só na fila */}
         {abaVis === "fila" && (
           <>
+            <div style={{ width:1, height:20, background:C.bdr, flexShrink:0 }}/>
             <select value={filtroCat} onChange={e=>setFiltroCat(e.target.value)}
               style={{ padding:"5px 9px", borderRadius:7, border:`1px solid ${C.bdr}`,
                 background:C.bg, fontSize:11, color:filtroCat?C.txt:C.txm, outline:"none" }}>
@@ -382,9 +416,18 @@ export function ConversaoPage({ data }) {
             {(filtroCat||filtroNivel) && (
               <button onClick={()=>{setFiltroCat("");setFiltroNivel("");}}
                 style={{ padding:"5px 9px", borderRadius:7, border:`1px solid ${C.bdr}`,
-                  background:C.surf, fontSize:10, cursor:"pointer", color:C.txs }}>✕</button>
+                  background:C.surf, fontSize:10, cursor:"pointer", color:C.txs }}>✕ Limpar</button>
             )}
           </>
+        )}
+
+        {/* Badge indicando filtro ativo */}
+        {filtroPromo && (
+          <div style={{ marginLeft:"auto", padding:"3px 10px", borderRadius:999,
+            background:C.prl, border:`1px solid ${C.pri}33`,
+            fontSize:9, fontWeight:600, color:C.prt, whiteSpace:"nowrap" }}>
+            📊 Filtrado: {filtroPromo}
+          </div>
         )}
       </div>
 

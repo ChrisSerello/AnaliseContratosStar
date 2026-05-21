@@ -1,6 +1,4 @@
-// ── ContractIQ · Utilities ───────────────────────────────────
 
-// ── Formatters ───────────────────────────────────────────────
 export const fmt$ = (v) => {
   const n = parseFloat(String(v || 0).replace(/[^\d.,]/g, "").replace(",", "."));
   if (!n || isNaN(n)) return "—";
@@ -21,7 +19,7 @@ export const clip = (s, n = 20) =>
 export const nrm = (s) =>
   (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
 
-// ── Stage Classifier ─────────────────────────────────────────
+// Stage Classifier
 export function stageOf(record) {
   const s = nrm(record.situacao || "");
   const a = nrm(record.atividade || "");
@@ -36,8 +34,7 @@ export function stageOf(record) {
   return "Digitado";
 }
 
-// ── Column Mapper ────────────────────────────────────────────
-// Each key maps to an array of column name variants (normalized).
+// colubnas a serem lidas da planilha
 export const COLUMN_VARIANTS = {
   nome_matriz:       ["nome matriz", "nomematriz", "matriz", "nome_matriz"],
   nome_promotora:    ["nome da promotora", "promotora", "nome_promotora", "nome promotora"],
@@ -54,10 +51,7 @@ export const COLUMN_VARIANTS = {
   valor_liberado:    ["valor liberado", "valor", "vl_liberado", "montante", "valor_liberado"],
 };
 
-/**
- * Given a list of raw column headers, returns a map of
- * { canonical_key: original_header_name }
- */
+
 export function mapColumns(headers) {
   const mapped = {};
   headers.forEach((h) => {
